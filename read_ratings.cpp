@@ -213,19 +213,38 @@ std::vector<Rating> read_ratings(const std::string& path, size_t max_rows = SIZE
     return df;
 }
 
+// Randomly put each rating in test with probability test_frac (fixed seed).
+void split_train_test(const std::vector<Rating>& all, std::vector<Rating>& train,
+                      std::vector<Rating>& test, double test_frac, unsigned seed) {
+    std::mt19937 gen(seed);
+    std::uniform_real_distribution<double> dist(0.0, 1.0);
+    train.clear();
+    test.clear();
+    train.reserve((size_t)(all.size() * (1 - test_frac) * 1.01));
+    test.reserve((size_t)(all.size() * test_frac * 1.01));
+    for (const auto& r : all)
+        (dist(gen) < test_frac ? test : train).push_back(r);
+}
+
+// Release a vector's memory (clear() alone keeps the capacity).
+template <class T> void free_vector(std::vector<T>& v) { std::vector<T>().swap(v); }
+
 int main(int argc, char** argv) {
-    if (argc < 3) {
-        std::cerr << "usage: " << argv[0] << " train_file test_file [max_rows]\n";
+    if (argc < 2) {
+        std::cerr << "usage: " << argv[0] << " train_file test_file\n"
+                  << "       " << argv[0] << " ratings_file [max_rows]   (random 80/20 split)\n";
         return 1;
     }
-    size_t max_rows = (argc >= 4) ? std::stoul(argv[3]) : SIZE_MAX;
+    // Second argument is either a test file or a row limit.
+    bool split_mode = (argc < 3) || std::isdigit((unsigned char)argv[2][0]);
+    size_t max_rows = (split_mode && argc >= 3) ? std::stoul(argv[2]) : SIZE_MAX;
 
     auto t0 = Clock::now();
-    std::vector<Rating> df   = read_ratings(argv[1], max_rows);
-    std::vector<Rating> test = read_ratings(argv[2], max_rows);
+    std::vector<Rating> df = read_ratings(argv[1], max_rows);
+    std::vector<Rating> test;
+    if (!split_mode) test = read_ratings(argv[2]);
     double t_read = seconds_since(t0);
 
-    
 
     // df.head() / df.tail()
     size_t n = df.size();
@@ -261,12 +280,22 @@ int main(int argc, char** argv) {
         if (c) std::cout << "  " << std::setprecision(1) << v << " : " << c << "\n";
     }
 
+    // one file given: hold out 20% of ratings as the test set
+    if (split_mode) {
+        std::vector<Rating> train_part;
+        split_train_test(df, train_part, test, 0.2, 123);
+        df.swap(train_part);          // df is now the training part
+        free_vector(train_part);      // free the full copy
+        std::cout << "\nrandom split: " << df.size() << " train, " << test.size() << " test\n";
+    }
+
     // ids -> 0-based indices (from train only), then build R and Rt
     t0 = Clock::now();
     auto uidx = make_index(df, true);
     auto iidx = make_index(df, false);
     int n_users = (int)uidx.size(), n_items = (int)iidx.size();
     std::vector<Rating> train = remap(df, uidx, iidx);
+    free_vector(df); 
     size_t n_test_raw = test.size();
     test = remap(test, uidx, iidx);
     CSR R  = build_csr(train, n_users, true);
