@@ -1,0 +1,57 @@
+--------------------------------------------------------------------------
+WARNING: Open MPI tried to bind a process but failed.  This is a
+warning only; your job will continue, though performance may
+be degraded.
+
+  Local host:        035f7803f267
+  Application name:  ./als_mpi
+  Error message:     failed to bind memory
+  Location:          ../../../../../../orte/mca/rtc/hwloc/rtc_hwloc.c:447
+
+--------------------------------------------------------------------------
+MPI ranks: 16
+train: 1599875 ratings, 12833 users, 31266 movies
+test : 397279 ratings kept, 2883 dropped (user/movie not in train)
+ratings per user : min 11, median 58, mean 124.7, max 4504
+ratings per movie: min 1, median 3, mean 51.2, max 5187
+baseline (predict mean 3.552): test RMSE 1.0527
+
+partition (-part nnz):
+ rank      users   user ratings     movies  movie ratings
+    0        733         100002         52         100955
+    1        820          99991         77          99100
+    2        685         100070        108         100878
+    3        764          99954        170          99718
+    4        754         100074        163         100425
+    5        798          99925        152          99826
+    6        830         100031        202         101371
+    7        814          99986        266          98177
+    8        840         100291        226          99949
+    9        829          99760        459          99776
+   10        845         100008        547          99745
+   11        856          99821        568         100054
+   12        865          99989       1058         100132
+   13        738         100732       1152          99891
+   14        801          99866       3070          99887
+   15        861          99375      22996          99991
+largest block / average: users 1.007, movies 1.014
+
+setup: load + prepare 0.966 s (rank 0), distribute 0.010 s
+
+ALS: k = 10, lambda = 0.1, 16 ranks
+ iter   train RMSE    test RMSE   iter (s)  compute (s)  comm (s)  imbalance
+    1     0.847743     0.887148     0.0182       0.0140    0.0112      1.745
+    2     0.805540     0.853685     0.0178       0.0154    0.0107      1.961
+    3     0.773588     0.833196     0.0200       0.0181    0.0130      2.266
+    4     0.759541     0.825197     0.0198       0.0179    0.0127      2.241
+    5     0.750958     0.820274     0.0199       0.0181    0.0128      2.264
+    6     0.745601     0.817110     0.0198       0.0181    0.0127      2.259
+    7     0.742268     0.815132     0.0197       0.0180    0.0127      2.254
+    8     0.740226     0.813944     0.0200       0.0182    0.0128      2.272
+    9     0.738965     0.813241     0.0201       0.0183    0.0130      2.281
+   10     0.738158     0.812819     0.0200       0.0183    0.0128      2.282
+
+RESULT,ranks,k,lambda,part,iters,load_s,distribute_s,avg_iter_s,avg_compute_s,avg_comm_s,avg_imbalance,train_rmse,test_rmse
+RESULT,16,10,0.1,nnz,10,0.966,0.010,0.0197,0.0178,0.0126,2.231,0.738158,0.812819
+[035f7803f267:08510] 15 more processes have sent help message help-orte-odls-default.txt / memory not bound
+[035f7803f267:08510] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages

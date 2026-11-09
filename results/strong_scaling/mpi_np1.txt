@@ -1,0 +1,40 @@
+--------------------------------------------------------------------------
+WARNING: Open MPI tried to bind a process but failed.  This is a
+warning only; your job will continue, though performance may
+be degraded.
+
+  Local host:        035f7803f267
+  Application name:  ./als_mpi
+  Error message:     failed to bind memory
+  Location:          ../../../../../../orte/mca/rtc/hwloc/rtc_hwloc.c:447
+
+--------------------------------------------------------------------------
+MPI ranks: 1
+train: 25599658 ratings, 200948 users, 80203 movies
+test : 6395745 ratings kept, 4801 dropped (user/movie not in train)
+ratings per user : min 9, median 58, mean 127.4, max 26674
+ratings per movie: min 1, median 5, mean 319.2, max 82350
+baseline (predict mean 3.540): test RMSE 1.0588
+
+partition (-part nnz):
+ rank      users   user ratings     movies  movie ratings
+    0     200948       25599658      80203       25599658
+largest block / average: users 1.000, movies 1.000
+
+setup: load + prepare 15.328 s (rank 0), distribute 0.416 s
+
+ALS: k = 10, lambda = 0.1, 1 ranks
+ iter   train RMSE    test RMSE   iter (s)  compute (s)  comm (s)  imbalance
+    1     0.860943     0.880731     2.0283       2.0283    0.0000      1.000
+    2     0.833025     0.851014     2.0248       2.0248    0.0000      1.000
+    3     0.799866     0.823096     2.0035       2.0035    0.0000      1.000
+    4     0.785612     0.812166     2.0154       2.0154    0.0000      1.000
+    5     0.778136     0.806695     2.0829       2.0829    0.0000      1.000
+    6     0.773695     0.803581     2.0222       2.0222    0.0000      1.000
+    7     0.770923     0.801733     2.0406       2.0406    0.0000      1.000
+    8     0.769134     0.800602     2.0149       2.0149    0.0000      1.000
+    9     0.767973     0.799903     2.0190       2.0190    0.0000      1.000
+   10     0.767224     0.799474     2.0156       2.0156    0.0000      1.000
+
+RESULT,ranks,k,lambda,part,iters,load_s,distribute_s,avg_iter_s,avg_compute_s,avg_comm_s,avg_imbalance,train_rmse,test_rmse
+RESULT,1,10,0.1,nnz,10,15.328,0.416,2.0265,2.0265,0.0000,1.000,0.767224,0.799474

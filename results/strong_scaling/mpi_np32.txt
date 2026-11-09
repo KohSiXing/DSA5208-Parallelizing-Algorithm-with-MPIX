@@ -1,0 +1,73 @@
+--------------------------------------------------------------------------
+WARNING: Open MPI tried to bind a process but failed.  This is a
+warning only; your job will continue, though performance may
+be degraded.
+
+  Local host:        035f7803f267
+  Application name:  ./als_mpi
+  Error message:     failed to bind memory
+  Location:          ../../../../../../orte/mca/rtc/hwloc/rtc_hwloc.c:447
+
+--------------------------------------------------------------------------
+[035f7803f267:04025] 31 more processes have sent help message help-orte-odls-default.txt / memory not bound
+[035f7803f267:04025] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+MPI ranks: 32
+train: 25599658 ratings, 200948 users, 80203 movies
+test : 6395745 ratings kept, 4801 dropped (user/movie not in train)
+ratings per user : min 9, median 58, mean 127.4, max 26674
+ratings per movie: min 1, median 5, mean 319.2, max 82350
+baseline (predict mean 3.540): test RMSE 1.0588
+
+partition (-part nnz):
+ rank      users   user ratings     movies  movie ratings
+    0       6492         800065         47         828555
+    1       6282         799978         56         773682
+    2       6141         799990         48         808120
+    3       6182         799935         34         816172
+    4       6106         799980         53         773515
+    5       6309         800029         57         828617
+    6       6268         799981         31         797204
+    7       6267         799992         59         784589
+    8       6296         800034         49         801358
+    9       6263         799947         76         791641
+   10       6277         800011         79         799332
+   11       6187         800272        128         811771
+   12       6273         799777        106         792461
+   13       6135         799920         93         800724
+   14       6452         801100        138         811247
+   15       6363         798878         84         793786
+   16       6064         800130        149         788908
+   17       6153         799908        161         800709
+   18       6409         799879        194         801870
+   19       6351         800136        250         797256
+   20       6275         799867        454         802172
+   21       6196         800661        307         797771
+   22       6182         799299        216         798364
+   23       6513         800026        265         802021
+   24       6512         800084        296         807259
+   25       6388         799906        365         791151
+   26       6306         799941        565         803787
+   27       5732         800002        786         795739
+   28       6349         800019       1352         799944
+   29       6397         799983       2237         800227
+   30       6517         800130       4801         799719
+   31       6311         799798      66667         799987
+largest block / average: users 1.001, movies 1.036
+
+setup: load + prepare 15.338 s (rank 0), distribute 0.244 s
+
+ALS: k = 10, lambda = 0.1, 32 ranks
+ iter   train RMSE    test RMSE   iter (s)  compute (s)  comm (s)  imbalance
+    1     0.860943     0.880731     0.2057       0.1472    0.1003      1.201
+    2     0.833025     0.851014     0.1980       0.1404    0.0972      1.168
+    3     0.799866     0.823096     0.1982       0.1419    0.0996      1.171
+    4     0.785612     0.812166     0.2048       0.1457    0.1027      1.188
+    5     0.778136     0.806695     0.2014       0.1443    0.1087      1.191
+    6     0.773695     0.803581     0.1973       0.1429    0.0988      1.175
+    7     0.770923     0.801733     0.1983       0.1434    0.0973      1.173
+    8     0.769134     0.800602     0.2003       0.1431    0.1036      1.173
+    9     0.767973     0.799903     0.1955       0.1400    0.0946      1.168
+   10     0.767224     0.799474     0.2050       0.1461    0.1039      1.195
+
+RESULT,ranks,k,lambda,part,iters,load_s,distribute_s,avg_iter_s,avg_compute_s,avg_comm_s,avg_imbalance,train_rmse,test_rmse
+RESULT,32,10,0.1,nnz,10,15.338,0.244,0.1999,0.1431,0.1007,1.178,0.767224,0.799474
