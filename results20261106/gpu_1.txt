@@ -1,0 +1,31 @@
+MPI ranks: 1, GPUs visible to each rank: 1
+target regions run on: GPU
+train: 25599658 ratings, 200948 users, 80203 movies
+test : 6395745 ratings kept, 4801 dropped (user/movie not in train)
+ratings per user : min 9, median 58, mean 127.4, max 26674
+ratings per movie: min 1, median 5, mean 319.2, max 82350
+baseline (predict mean 3.540): test RMSE 1.0588
+
+partition (-part nnz):
+ rank      users   user ratings     movies  movie ratings
+    0     200948       25599658      80203       25599658
+largest block / average: users 1.000, movies 1.000
+
+setup: load + prepare 17.656 s (rank 0), distribute 0.407 s
+
+ALS: k = 10, lambda = 0.1, 1 ranks, one GPU each
+ iter   train RMSE    test RMSE   iter (s)  compute (s)  comm (s)  transfer (s)  imbalance
+copy data to GPU: 0.033 s (rank 0)
+    1     0.860943     0.880731     0.5677       0.5648    0.0000        0.0028      1.000
+    2     0.833025     0.851014     0.5699       0.5671    0.0000        0.0028      1.000
+    3     0.799866     0.823096     0.5693       0.5666    0.0000        0.0027      1.000
+    4     0.785612     0.812166     0.5675       0.5647    0.0000        0.0028      1.000
+    5     0.778136     0.806695     0.5692       0.5664    0.0000        0.0028      1.000
+    6     0.773695     0.803581     0.5693       0.5665    0.0000        0.0028      1.000
+    7     0.770923     0.801733     0.5680       0.5653    0.0000        0.0028      1.000
+    8     0.769134     0.800602     0.5694       0.5666    0.0000        0.0028      1.000
+    9     0.767973     0.799903     0.5677       0.5649    0.0000        0.0028      1.000
+   10     0.767224     0.799474     0.5595       0.5567    0.0000        0.0028      1.000
+
+RESULT,ranks,k,lambda,part,iters,load_s,distribute_s,avg_iter_s,avg_compute_s,avg_comm_s,avg_imbalance,train_rmse,test_rmse,threads,program,users,movies,train_ratings,avg_transfer_s
+RESULT,1,10,0.1,nnz,10,17.656,0.407,0.5677,0.5650,0.0000,1.000,0.767224,0.799474,2,gpu,200948,80203,25599658,0.0028

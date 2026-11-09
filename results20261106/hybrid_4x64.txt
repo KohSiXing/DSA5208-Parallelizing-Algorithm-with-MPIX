@@ -1,0 +1,45 @@
+--------------------------------------------------------------------------
+WARNING: Open MPI tried to bind a process but failed.  This is a
+warning only; your job will continue, though performance may
+be degraded.
+
+  Local host:        593585e99a40
+  Application name:  ./als_hybrid
+  Error message:     failed to bind memory
+  Location:          ../../../../../../orte/mca/rtc/hwloc/rtc_hwloc.c:447
+
+--------------------------------------------------------------------------
+[593585e99a40:08811] 3 more processes have sent help message help-orte-odls-default.txt / memory not bound
+[593585e99a40:08811] Set MCA parameter "orte_base_help_aggregate" to 0 to see all help / error messages
+MPI ranks: 4, OpenMP threads per rank: 64 (256 cores in total)
+train: 25599658 ratings, 200948 users, 80203 movies
+test : 6395745 ratings kept, 4801 dropped (user/movie not in train)
+ratings per user : min 9, median 58, mean 127.4, max 26674
+ratings per movie: min 1, median 5, mean 319.2, max 82350
+baseline (predict mean 3.540): test RMSE 1.0588
+
+partition (-part nnz):
+ rank      users   user ratings     movies  movie ratings
+    0      50047        6399950        385        6410454
+    1      50246        6399939        753        6402320
+    2      50143        6399906       1996        6389071
+    3      50512        6399863      77069        6397813
+largest block / average: users 1.000, movies 1.002
+
+setup: load + prepare 24.907 s (rank 0), distribute 0.353 s
+
+ALS: k = 10, lambda = 0.1, 4 ranks x 64 threads
+ iter   train RMSE    test RMSE   iter (s)  compute (s)  comm (s)  imbalance
+    1     0.860943     0.880731     0.0922       0.0623    0.0542      1.258
+    2     0.833025     0.851014     0.0633       0.0449    0.0443      1.509
+    3     0.799866     0.823096     0.0664       0.0404    0.0528      1.493
+    4     0.785612     0.812166     0.0666       0.0358    0.0530      1.307
+    5     0.778136     0.806695     0.0758       0.0368    0.0622      1.244
+    6     0.773695     0.803581     0.0597       0.0424    0.0392      1.319
+    7     0.770923     0.801733     0.0694       0.0372    0.0506      1.172
+    8     0.769134     0.800602     0.0813       0.0414    0.0677      1.473
+    9     0.767973     0.799903     0.0707       0.0455    0.0571      1.560
+   10     0.767224     0.799474     0.0863       0.0644    0.0727      1.915
+
+RESULT,ranks,k,lambda,part,iters,load_s,distribute_s,avg_iter_s,avg_compute_s,avg_comm_s,avg_imbalance,train_rmse,test_rmse,threads,program,users,movies,train_ratings,avg_transfer_s
+RESULT,4,10,0.1,nnz,10,24.907,0.353,0.0711,0.0432,0.0555,1.444,0.767224,0.799474,64,hybrid,200948,80203,25599658,0
