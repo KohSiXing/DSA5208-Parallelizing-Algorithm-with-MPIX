@@ -1,28 +1,3 @@
-// als_gpu.cpp - Alternating Least Squares (ALS) for MovieLens, MPI + OpenMP offload to GPU.
-//
-// Same program as als_hybrid.cpp, except that the per-user and per-movie solves
-// run on a GPU using OpenMP "target" offloading:
-//
-//   * Each MPI rank uses one GPU (rank i uses GPU i % number_of_GPUs).
-//   * The rank's ratings (its rows of R and Rt) and the factors U and V are
-//     copied to the GPU once, before the iterations start, and stay there.
-//   * Each half-step: the GPU solves this rank's rows (one GPU thread per user
-//     or movie), the new rows are copied back to the CPU, MPI_Allgatherv shares
-//     them with the other ranks, and the complete U (or V) is copied to the GPU.
-//   * The maths is the same hand-written code as the CPU programs (no cuBLAS /
-//     cuSOLVER). The GPU may fuse multiply-adds, so results can differ from the
-//     CPU programs in the last few digits only.
-//   * The RMSE is computed on the CPU (not timed).
-//
-// Build (NVIDIA HPC SDK; cc80 = A100, cc70 = V100, cc90 = H100):
-//         mpicxx -O2 -std=c++17 -mp=gpu -gpu=cc80 -Minfo=mp -o als_gpu als_gpu.cpp
-//   Factors k up to KMAX (default 32); for larger k add  -DKMAX=64
-// Run:    export OMP_TARGET_OFFLOAD=MANDATORY    # stop with an error if no GPU is used
-//         mpirun -np 1 ./als_gpu ml-32m/ratings.csv
-// Without a GPU compiler (e.g. g++ -fopenmp) the target code runs on the CPU instead,
-// which is only useful for checking the program logic.
-// Options: same as als_hybrid.cpp (-k -lambda -iters -part -rows -sample)
-
 #include <mpi.h>
 #include <omp.h>
 
@@ -157,7 +132,7 @@ CSR build_csr(const std::vector<Rating>& df, int n_rows, bool by_user) {
 }
 
 // ===========================================================================
-// ALS maths (same as the serial program)
+// ALS Formula
 // Factors are stored row-major: X[r*k + f] is factor f of row r.
 // ===========================================================================
 

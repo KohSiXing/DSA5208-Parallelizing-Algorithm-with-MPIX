@@ -1,30 +1,3 @@
-// als_hybrid.cpp - Alternating Least Squares (ALS) for MovieLens, MPI + OpenMP.
-//
-// Same program as als_mpi.cpp, with one addition: inside each MPI rank, the
-// per-user and per-movie solves are shared among OpenMP threads.
-//
-//   * MPI   splits users and movies into blocks, one block per rank (as in als_mpi).
-//   * OpenMP splits each rank's block among its threads. Rows have very different
-//     numbers of ratings, so threads take rows in small chunks as they become
-//     free (schedule(dynamic)) instead of a fixed equal share.
-//   * Only the main thread calls MPI (MPI_THREAD_FUNNELED).
-//   * Each row is still solved by exactly one thread with the same arithmetic,
-//     so U and V are identical to the serial and pure-MPI programs.
-//
-// Fewer ranks with more threads each means fewer copies of U and V, and so less
-// data moved by MPI_Allgatherv every iteration.
-//
-// Build:  mpicxx -O2 -std=c++17 -fopenmp -o als_hybrid als_hybrid.cpp
-// Run:    export OMP_NUM_THREADS=4
-//         mpirun -np 2 ./als_hybrid ml-32m/ratings.csv
-// Options (after the file names):
-//         -k 10          number of latent factors
-//         -lambda 0.1    regularisation strength
-//         -iters 10      number of ALS iterations
-//         -part nnz      split rows across ranks by ratings (nnz) or by count (rows)
-//         -rows N        only read the first N ratings
-//         -sample p      keep a random fraction p of the ratings (0 < p <= 1)
-
 #include <mpi.h>
 #include <omp.h>
 
@@ -159,7 +132,7 @@ CSR build_csr(const std::vector<Rating>& df, int n_rows, bool by_user) {
 }
 
 // ===========================================================================
-// ALS maths (same as the serial program)
+// ALS Formula
 // Factors are stored row-major: X[r*k + f] is factor f of row r.
 // ===========================================================================
 

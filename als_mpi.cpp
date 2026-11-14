@@ -1,35 +1,3 @@
-// als_mpi.cpp - Alternating Least Squares (ALS) for MovieLens, parallelised with pure MPI.
-//
-// How the work is split
-//   * Rank 0 reads the ratings file and builds the train/test sets and the two
-//     sparse matrices (R = ratings grouped by user, Rt = grouped by movie),
-//     exactly like the serial program.
-//   * Users are divided into P contiguous blocks, one block per rank, and so
-//     are movies. By default every block holds about the same number of
-//     RATINGS (-part nnz), because the work for a user grows with the number
-//     of movies they rated. "-part rows" gives every rank the same number of
-//     users/movies instead (the naive split, for comparison).
-//   * Rank 0 sends each rank only the rows of R and Rt in its blocks.
-//   * Every rank keeps a full copy of the factor matrices U and V.
-//     One iteration:
-//        1. each rank solves for its own users        (needs all of V)
-//        2. MPI_Allgatherv -> every rank has all of U
-//        3. each rank solves for its own movies       (needs all of U)
-//        4. MPI_Allgatherv -> every rank has all of V
-//   * Each user/movie is solved with exactly the same arithmetic as the
-//     serial code, so U and V come out identical for any number of ranks.
-//     The RMSE can differ only in the last digits (sums added in a different order).
-//
-// Build:  mpicxx -O2 -std=c++17 -o als_mpi als_mpi.cpp
-// Run:    mpirun -np 4 ./als_mpi ml-100k/u1.base ml-100k/u1.test
-//         mpirun -np 4 ./als_mpi ml-32m/ratings.csv             (one file: random 80/20 split)
-// Options (after the file names):
-//         -k 10          number of latent factors
-//         -lambda 0.1    regularisation strength
-//         -iters 10      number of ALS iterations
-//         -part nnz      split rows across ranks by ratings (nnz) or by count (rows)
-//         -rows N        only read the first N ratings (quick tests)
-
 #include <mpi.h>
 
 #include <algorithm>
@@ -151,7 +119,7 @@ CSR build_csr(const std::vector<Rating>& df, int n_rows, bool by_user) {
 }
 
 // ===========================================================================
-// ALS maths (same as the serial program)
+// ALS Formula
 // Factors are stored row-major: X[r*k + f] is factor f of row r.
 // ===========================================================================
 

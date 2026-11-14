@@ -1,23 +1,3 @@
-// als_serial.cpp - Alternating Least Squares (ALS) for MovieLens, serial (one core).
-//
-// The reference program: same data handling, maths, options and RESULT line as
-// als_mpi.cpp / als_hybrid.cpp / als_gpu.cpp, but no MPI and no threads.
-// Used for (1) correctness: the parallel programs must give the same RMSE, and
-// (2) the serial runtime scaling analysis (vary -rows, -sample and -k).
-//
-// Build:  g++ -O2 -std=c++17 -o als_serial als_serial.cpp
-// Run:    ./als_serial ml-100k/u1.base ml-100k/u1.test
-//         ./als_serial ml-32m/ratings.csv                  (one file: random 80/20 split)
-// Options (after the file names):
-//         -k 10          number of latent factors
-//         -lambda 0.1    regularisation strength
-//         -iters 10      number of ALS iterations
-//         -rows N        only read the first N ratings   (ml-32m is sorted by user, so this
-//                        changes the number of users and ratings together)
-//         -sample p      keep a random fraction p of the ratings (changes the number of
-//                        ratings while keeping almost the same users and movies)
-//         -part ...      accepted for compatibility with the parallel programs; ignored
-
 #include <algorithm>
 #include <cctype>
 #include <chrono>
@@ -154,7 +134,7 @@ CSR build_csr(const std::vector<Rating>& df, int n_rows, bool by_user) {
 }
 
 // ===========================================================================
-// ALS maths
+// ALS Formula
 // Factors are stored row-major: X[r*k + f] is factor f of row r.
 // ===========================================================================
 

@@ -1,0 +1,24 @@
+serial (1 core)
+train: 400525 ratings, 3158 users, 19277 movies
+test : 97670 ratings kept, 1856 dropped (user/movie not in train)
+ratings per user : min 11, median 60, mean 126.8, max 4505
+ratings per movie: min 1, median 2, mean 20.8, max 1273
+baseline (predict mean 3.538): test RMSE 1.0572
+
+setup: load + prepare 0.635 s
+
+ALS: k = 10, lambda = 0.1, serial
+ iter   train RMSE    test RMSE   iter (s)
+    1     0.832109     0.907245     0.0211
+    2     0.776692     0.882933     0.0209
+    3     0.739518     0.870505     0.0208
+    4     0.720341     0.860846     0.0208
+    5     0.710208     0.855162     0.0208
+    6     0.704128     0.851704     0.0208
+    7     0.700130     0.849472     0.0210
+    8     0.697303     0.847898     0.0218
+    9     0.695219     0.846695     0.0211
+   10     0.693666     0.845754     0.0219
+
+RESULT,ranks,k,lambda,part,iters,load_s,distribute_s,avg_iter_s,avg_compute_s,avg_comm_s,avg_imbalance,train_rmse,test_rmse,threads,program,users,movies,train_ratings,avg_transfer_s
+RESULT,1,10,0.1,none,10,0.635,0,0.0211,0.0211,0,1,0.693666,0.845754,1,serial,3158,19277,400525,0
