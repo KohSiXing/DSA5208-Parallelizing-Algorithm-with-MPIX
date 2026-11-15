@@ -29,7 +29,7 @@ This repository contains the codes and documents for DSA5208 Assignment 3 - Para
 | `results/` | Raw output (`.txt`) of every run: serial, MPI strong and weak scaling, MPI + OpenMP and GPU |
 
 ### Dataset
-MovieLens 32M (`ratings.csv`, 32,000,204 ratings), from [GroupLens](https://grouplens.org/datasets/movielens/):
+MovieLens 32M (`ratings.csv`), from [GroupLens](https://grouplens.org/datasets/movielens/32m/):
 ```bash
 wget https://files.grouplens.org/datasets/movielens/ml-32m.zip && unzip ml-32m.zip
 cp ml-32m/ratings.csv ./ratings.csv
@@ -41,7 +41,7 @@ The weak-scaling subsets (`ratings_1of64.csv`, `ratings_1of16.csv`, `ratings_1of
   ```bash
   apt-get update && apt-get install -y build-essential openmpi-bin libopenmpi-dev
   ```
-- GPU version only: an NVIDIA GPU and the [NVIDIA HPC SDK](https://developer.nvidia.com/hpc-sdk) (`nvc++`)
+- GPU version only: an NVIDIA GPU
 - Notebook (OPTIONAL; For Graphs and Splitting Dataset): Python 3 with `pandas` and `matplotlib`
 
 ### How to Compile
@@ -68,7 +68,7 @@ With one data file, 20% of the ratings are held out at random (fixed seed) as th
 # MPI, e.g. 64 processes
 mpirun -np 64 --bind-to core ./als_mpi ratings.csv
 
-# MPI + OpenMP, e.g. 4 processes x 64 threads = 256 cores
+# MPI + OpenMP, e.g. 64 processes x 4 threads = 256 cores
 mpirun --allow-run-as-root --use-hwthread-cpus -np 64 --map-by slot:PE=4  -x OMP_NUM_THREADS=4  ./als_hybrid ratings.csv
 
 # MPI + GPU, 1 process on 1 GPU 
