@@ -8,6 +8,7 @@ This repository contains the codes and documents for DSA5208 Assignment 3 - Para
 ![NVIDIA GPU](https://img.shields.io/badge/NVIDIA-GPU_Offload-76B900.svg?style=flat&logo=nvidia&logoColor=76B900)
 ![Bash](https://img.shields.io/badge/Bash-Shell-dd4814?style=flat&&logo=gnu-bash&logoColor=FFF)
 
+
 ### Team Members
 |  Matriculation Number | Name                |
 | ---                   | ---                 |
@@ -15,4 +16,65 @@ This repository contains the codes and documents for DSA5208 Assignment 3 - Para
 | A0221663L             | Ashley Lee Ruoxin   |
 | A0333470L             | Kevin Royce Thomson | 
 
-## Main Files/Folders
+
+### Main Files/Folders
+| File / Folder | Description |
+| --- | --- |
+| `als_serial.cpp` | Serial ALS (1 core). Baseline for correctness and speedup, and used for the serial scaling analysis |
+| `als_mpi.cpp` | Pure MPI ALS. Users and movies are split across processes (balanced by number of ratings); factors are shared with `MPI_Allgatherv` |
+| `als_hybrid.cpp` | MPI + OpenMP ALS. Same as `als_mpi.cpp`, with OpenMP threads sharing each process's users and movies |
+| `als_gpu.cpp` | MPI + GPU ALS. The per-user and per-movie solves run on the GPU via OpenMP target offload |
+| `all_results_long.csv` | Every run compiled in long format: one row per run per iteration, with timings, RMSE, cores, threads, GPUs and dataset size |
+| `data cleaning and analysis.ipynb` | Creates the 1/64, 1/16 and 1/4 dataset subsets, and produces the charts and tables in the report |
+| `results/` | Raw output (`.txt`) of every run: serial, MPI strong and weak scaling, MPI + OpenMP and GPU |
+
+### Dataset
+MovieLens 32M (`ratings.csv`, 32,000,204 ratings), from [GroupLens](https://grouplens.org/datasets/movielens/):
+```bash
+wget https://files.grouplens.org/datasets/movielens/ml-32m.zip && unzip ml-32m.zip
+cp ml-32m/ratings.csv ./ratings.csv
+```
+The weak-scaling subsets (`ratings_1of64.csv`, `ratings_1of16.csv`, `ratings_1of4.csv`) are made in `data cleaning and analysis.ipynb` by picking random users (fixed seed 42) with all of their ratings.
+
+### Requirements
+- Linux with a C++17 compiler (`g++`) and Open MPI
+  ```bash
+  apt-get update && apt-get install -y build-essential openmpi-bin libopenmpi-dev
+  ```
+- GPU version only: an NVIDIA GPU and the [NVIDIA HPC SDK](https://developer.nvidia.com/hpc-sdk) (`nvc++`)
+- Notebook (OPTIONAL; For Graphs and Splitting Dataset): Python 3 with `pandas` and `matplotlib`
+
+### How to Compile
+```bash
+# Serial
+g++ -O2 -std=c++17 -o als_serial als_serial.cpp
+
+# MPI
+mpicxx -O2 -std=c++17 -o als_mpi als_mpi.cpp
+
+# MPI + OpenMP
+mpicxx -O2 -std=c++17 -fopenmp -o als_hybrid als_hybrid.cpp
+
+# MPI + GPU (with the NVIDIA HPC SDK compilers and MPI on the PATH)
+mpicxx -O2 -std=c++17 -mp=gpu -gpu=ccnative -Minfo=mp -o als_gpu als_gpu.cpp
+```
+
+### How to Run
+With one data file, 20% of the ratings are held out at random (fixed seed) as the test set.
+```bash
+# Serial
+./als_serial ratings.csv
+
+# MPI, e.g. 64 processes
+mpirun -np 64 --bind-to core ./als_mpi ratings.csv
+
+# MPI + OpenMP, e.g. 4 processes x 64 threads = 256 cores
+mpirun --allow-run-as-root --use-hwthread-cpus -np 64 --map-by slot:PE=4  -x OMP_NUM_THREADS=4  ./als_hybrid ratings.csv
+
+# MPI + GPU, 1 process on 1 GPU 
+mpirun --allow-run-as-root -np 1 -x OMP_TARGET_OFFLOAD=MANDATORY -x CUDA_VISIBLE_DEVICES=0 ./als_gpu ratings.csv
+```
+
+Notes:
+- More processes than physical cores (e.g. 256 on a 192-core machine): add `--use-hwthread-cpus --bind-to hwthread`.
+- Running as root: add `--allow-run-as-root`. Inside containers, `--mca hwloc_base_mem_bind_failure_action silent` hides a harmless memory-binding warning, and `ulimit -n 65536` avoids the "too many open pipes" error at 256 processes.
