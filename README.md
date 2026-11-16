@@ -18,14 +18,15 @@ This repository contains the codes and documents for DSA5208 Assignment 3 - Para
 
 
 ### Main Files/Folders
-| File / Folder                       | Description                                                                                              |
-| ---                                 | ---                                                                                                      |
-| `als_serial.cpp`                    | Serial ALS baseline for correctness, speedup and serial scaling.                                         |
-| `als_mpi.cpp`                       | MPI ALS with user and movie blocks distributed across processes and factors shared via `MPI_Allgatherv`. |
-| `als_hybrid.cpp`                    | MPI + OpenMP ALS, using threads to parallelise updates within each process.                              |
-| `als_gpu.cpp`                       | MPI + GPU ALS, using OpenMP GPU offloading for user and movie updates.                                   |
-| `all_results_long.csv`              | Results by run and iteration, including timings, RMSE, resources and dataset size.                       |
-| `data cleaning and analysis.ipynb`  | Prepares dataset subsets and produces the report's charts and tables.                                    |
+| File / Folder                     | Description                                                                                              |
+| ---                               | ---                                                                                                      |
+| als_serial.cpp                    | Serial ALS baseline for correctness, speedup and serial scaling.                                         |
+| als_mpi.cpp                       | MPI ALS with user and movie blocks distributed across processes and factors shared via `MPI_Allgatherv`. |
+| als_hybrid.cpp                    | MPI + OpenMP ALS, using threads to parallelise updates within each process.                              |
+| als_gpu.cpp                       | MPI + GPU ALS, using OpenMP GPU offloading for user and movie updates.                                   |
+| all_results_long.csv              | Results by run and iteration, including timings, RMSE, resources and dataset size.                       |
+| Data Cleaning and Analysis.ipynb  | Prepares dataset subsets and produces the report's charts and tables.                                    |
+| DSA5208 Assignment 3 Report.pdf   | Report for this Assignment                                                                               |
 
 ### Dataset
 MovieLens 32M (`ratings.csv`), from [GroupLens](https://grouplens.org/datasets/movielens/32m/):
