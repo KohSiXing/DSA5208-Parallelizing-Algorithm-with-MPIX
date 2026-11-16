@@ -18,15 +18,14 @@ This repository contains the codes and documents for DSA5208 Assignment 3 - Para
 
 
 ### Main Files/Folders
-| File / Folder | Description |
-| --- | --- |
-| `als_serial.cpp` | Serial ALS (1 core). Baseline for correctness and speedup, and used for the serial scaling analysis |
-| `als_mpi.cpp` | Pure MPI ALS. Users and movies are split across processes (balanced by number of ratings); factors are shared with `MPI_Allgatherv` |
-| `als_hybrid.cpp` | MPI + OpenMP ALS. Same as `als_mpi.cpp`, with OpenMP threads sharing each process's users and movies |
-| `als_gpu.cpp` | MPI + GPU ALS. The per-user and per-movie solves run on the GPU via OpenMP target offload |
-| `all_results_long.csv` | Every run compiled in long format: one row per run per iteration, with timings, RMSE, cores, threads, GPUs and dataset size |
-| `data cleaning and analysis.ipynb` | Creates the 1/64, 1/16 and 1/4 dataset subsets, and produces the charts and tables in the report |
-| `results/` | Raw output (`.txt`) of every run: serial, MPI strong and weak scaling, MPI + OpenMP and GPU |
+| File / Folder                       | Description                                                                                              |
+| ---                                 | ---                                                                                                      |
+| `als_serial.cpp`                    | Serial ALS baseline for correctness, speedup and serial scaling.                                         |
+| `als_mpi.cpp`                       | MPI ALS with user and movie blocks distributed across processes and factors shared via `MPI_Allgatherv`. |
+| `als_hybrid.cpp`                    | MPI + OpenMP ALS, using threads to parallelise updates within each process.                              |
+| `als_gpu.cpp`                       | MPI + GPU ALS, using OpenMP GPU offloading for user and movie updates.                                   |
+| `all_results_long.csv`              | Results by run and iteration, including timings, RMSE, resources and dataset size.                       |
+| `data cleaning and analysis.ipynb`  | Prepares dataset subsets and produces the report's charts and tables.                                    |
 
 ### Dataset
 MovieLens 32M (`ratings.csv`), from [GroupLens](https://grouplens.org/datasets/movielens/32m/):
@@ -69,12 +68,8 @@ With one data file, 20% of the ratings are held out at random (fixed seed) as th
 mpirun -np 64 --bind-to core ./als_mpi ratings.csv
 
 # MPI + OpenMP, e.g. 64 processes x 4 threads = 256 cores
-mpirun --allow-run-as-root --use-hwthread-cpus -np 64 --map-by slot:PE=4  -x OMP_NUM_THREADS=4  ./als_hybrid ratings.csv
+mpirun -np 64 --map-by slot:PE=4 -x OMP_NUM_THREADS=4 ./als_hybrid ratings.csv
 
 # MPI + GPU, 1 process on 1 GPU 
-mpirun --allow-run-as-root -np 1 -x OMP_TARGET_OFFLOAD=MANDATORY -x CUDA_VISIBLE_DEVICES=0 ./als_gpu ratings.csv
+mpirun -np 1 -x OMP_TARGET_OFFLOAD=MANDATORY -x CUDA_VISIBLE_DEVICES=0 ./als_gpu ratings.csv
 ```
-
-Notes:
-- More processes than physical cores (e.g. 256 on a 192-core machine): add `--use-hwthread-cpus --bind-to hwthread`.
-- Running as root: add `--allow-run-as-root`. Inside containers, `--mca hwloc_base_mem_bind_failure_action silent` hides a harmless memory-binding warning, and `ulimit -n 65536` avoids the "too many open pipes" error at 256 processes.
