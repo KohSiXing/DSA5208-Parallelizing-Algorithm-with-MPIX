@@ -38,9 +38,6 @@ The weak-scaling subsets (`ratings_1of64.csv`, `ratings_1of16.csv`, `ratings_1of
 
 ### Requirements
 - Linux with a C++17 compiler (`g++`) and Open MPI
-  ```bash
-  apt-get update && apt-get install -y build-essential openmpi-bin libopenmpi-dev
-  ```
 - GPU version only: an NVIDIA GPU
 - Notebook (OPTIONAL; For Graphs and Splitting Dataset): Python 3 with `pandas` and `matplotlib`
 
